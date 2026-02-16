@@ -4,10 +4,14 @@
 **	Assemble command:
 **	Programs:Developer/VASM/vasmm68k_mot BlueScreenFast.s -Fhunkexe
 **	
-**	Author: Tomas Jacobsen - Bedroomcoders.com
+**	Original Author: Tomas Jacobsen - Bedroomcoders.com
+**  Author: Kai Kruschinski
+**
 **	Description: 
-**	This code is similar to BlueScreenSlow which explains each step in more detail.
-**	In this source, the fill routine is optimized for the Vampires AC68080 CPU.
+**	This code was inspired by BlueScreenFast from Tomas Jacobsen.
+**	Instead of blue pixel the code now shows a picture (1280x720 - 16 Bit Color)
+**  and is waiting for left mouse button. Actually not really  exciting,
+**  but a starting point for my rusted 68k skills.
 **			
 **
 
@@ -41,7 +45,7 @@ SPRHSTRT	equ	$dff1d0
 _Init		movea.l	4.w,a6
 			jsr	_LVODisable(a6)
 
-			move.w	DMACONR,store_dmacon
+			move.w	DMACONR,store_dmacon	; save registers
 			move.w	GFXCONR,store_gfxcon
 			move.w	BPLHMODR,store_bplhmod
 			move.l	BPLHPTHR,store_bplhpth
@@ -62,7 +66,7 @@ _Init		movea.l	4.w,a6
 			bne.s	.lmbLoop
 
 
-			move.w	store_dmacon,DMACON
+			move.w	store_dmacon,DMACON		; restore saved registers
 			move.w	store_gfxcon,GFXCON
 			move.w	store_bplhmod,BPLHMOD
 			move.l	store_bplhpth,BPLHPTH
