@@ -20,7 +20,7 @@
 			
 			machine 68080					; NOTE - Tells the assembler to treat this source as 68080 code.
 
-			incdir	"Programs:vasm\Include"
+			incdir	"L:\Amiga\Include"
 			include	"exec\exec_lib.i"
 
 			output	showpic.exe
