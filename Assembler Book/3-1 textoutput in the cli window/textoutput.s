@@ -50,7 +50,7 @@ Output          equ -60
 
                 move.L  clihandle,d1            ; Load Handle in d1
                 move.L  #text,d2                ; Address of text in memory
-                move.L  #33,d3                  ; Text length in d3
+                move.L  #(textend-text),d3      ; Text length in d3
                 jsr     Write(a6)               ; Call DOS Write
 
 *************** Close Lib *****************************************************
@@ -70,4 +70,5 @@ dosname:        dc.b    "dos.library",0
 dosbase:        ds.L    1
 clihandle       ds.L    1
 text:           dc.b    "My first Text in a CLI Window! Yeaah!!!",10
+textend:
                 even
