@@ -32,7 +32,7 @@ Write           equ -48
                 clr.L   d0                      ; Version doesn't matter
                 jsr     OpenLib(a6)             ; Open Lib
                 tst.L   d0                      ; Error opening?
-                beq     ende                    ; yes then quit
+                beq     exit                    ; yes then quit
                 move.L  d0,a6                   ; Save dosbase in a6
 
 *************** Get Output-Handle for the CLI Window **************************
@@ -57,7 +57,7 @@ Write           equ -48
                 move.l  ExecBase,a6
                 jsr     CloseLib(a6)
 
-ende:           rts
+exit:           rts
 
 *************** Data Area *****************************************************
 
@@ -65,4 +65,3 @@ ende:           rts
 
 dosname:        dc.b    "dos.library",0
                 even
-                
