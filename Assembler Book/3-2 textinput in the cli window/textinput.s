@@ -11,15 +11,7 @@
                 
                 machine 68080					; treat this source as 68080 code.
 
-                
-                incdir	"L:\Amiga\Include"
-    			include	"exec\exec_lib.i"
-                include "dos\dos.i"
-                include "dos\dos_lib.i"
-
                 output	textinput.exe
-
-
 
 
 ExecBase        equ 4
