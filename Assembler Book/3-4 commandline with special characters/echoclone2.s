@@ -8,11 +8,9 @@
 **              special characters
 **
 **
-                opt d+                          ; export with symbols
                 
                 machine 68080					; treat this source as 68080 code.
 
-                output	echoclone2.exe
 
 ExecBase        equ 4
 OpenLib         equ -552
