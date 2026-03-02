@@ -7,11 +7,8 @@
 ** Description: Read input from keyboard on a CLI window
 **
 **
-                opt d+                          ; export with symbols
                 
                 machine 68080					; treat this source as 68080 code.
-
-                output	textinput.exe
 
 
 ExecBase        equ 4
@@ -31,7 +28,7 @@ input           equ -54
                 clr.L   d0                      ; Version doesn't matter
                 jsr     OpenLib(a6)             ; Open Lib
                 tst.L   d0                      ; Error opening?
-                beq     ende                    ; yes then quit
+                beq     exit                    ; yes then quit
                 move.L  d0,a6                   ; Save dosbase in a6
 
 *************** Get Output-Handle for the CLI Window **************************
@@ -75,7 +72,7 @@ input           equ -54
                 move.L  ExecBase,a6             ; Set Exec Base
                 jsr     CloseLib(a6)            ; Close DOS Lib
 
-ende:           rts                
+exit:           rts                
 
 *************** Data Area *****************************************************
 
