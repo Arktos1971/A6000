@@ -7,21 +7,8 @@
 ** Description: Outputs text to a CLI window
 **
 **
-                opt d+                          ; export with symbols
-                
                 machine 68080					; treat this source as 68080 code.
-
                 
-                incdir	"L:\Amiga\Include"
-    			include	"exec\exec_lib.i"
-                include "dos\dos.i"
-                include "dos\dos_lib.i"
-
-                output	textoutput.exe
-
-
-
-
 ExecBase        equ 4
 OpenLib         equ -552
 CloseLib        equ -414
@@ -68,7 +55,7 @@ ende:           rts
 dosname:        dc.b    "dos.library",0
                 even
 dosbase:        ds.L    1
-clihandle       ds.L    1
+clihandle:      ds.L    1
 text:           dc.b    "My first Text in a CLI Window! Yeaah!!!",10
 textend:
                 even
