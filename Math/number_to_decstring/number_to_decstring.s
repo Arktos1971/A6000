@@ -21,11 +21,11 @@ Output          equ -60
                         move.L  #decstring_end,a0
                         bsr     number_to_decstring
                         move.L  d2,str_length
-                        move.L  a0,a5
+                        movea.L a0,a5
 
 *************** Open DOS-Lib **************************************************
 
-                        move.L  ExecBase,a6             ; Exec-Lib Base
+                        movea.L ExecBase,a6             ; Exec-Lib Base
                         lea     dosname,a1              ; DOS-Lib Name
                         clr.L   d0                      ; Version doesn't matter
                         jsr     OpenLib(a6)             ; Open Lib
@@ -35,7 +35,7 @@ Output          equ -60
 
 *************** Get Output-Handle for the CLI Window **************************
 
-                        move.L  dosbase,a6              ; Set dosbase
+                        movea.L dosbase,a6              ; Set dosbase
                         jsr     Output(a6)              ; Get Output-Handle
                         move.L  d0,clihandle            ; Save Handle
 
@@ -48,8 +48,8 @@ Output          equ -60
 
 *************** Close Lib *****************************************************
 
-                        move.L  dosbase,a1              ; DOS Lib Base Address
-                        move.L  4,a6                    ; Set Exec Base
+                        movea.L dosbase,a1              ; DOS Lib Base Address
+                        movea.L 4,a6                    ; Set Exec Base
                         jsr     CloseLib(a6)            ; Close DOS Lib
 
 exit:                   rts                        
