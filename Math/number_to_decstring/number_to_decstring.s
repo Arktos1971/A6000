@@ -65,7 +65,8 @@ exit:                   rts
 number_to_decstring:    moveq.l #0,d2               ; counter for string length
                         clr.b   (a0)                ; string is null terminated
 
-loop1:                  divul.L #10,d1:d0            ; d1 = remainder / d0 = quotient
+loop1:                  divul.L #10,d1:d0           ; d1 = remainder / d0 = quotient
+                                                    ; works only on 68020+
 
                         add.L   #'0',d1             ; remainder to character
                         move.b  d1,-(a0)            ; save digit in string
