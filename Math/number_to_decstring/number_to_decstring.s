@@ -55,6 +55,9 @@ Output          equ -60
 exit:                   rts                        
 
 *************** number_to_decstring *******************************************
+**
+** Converts a 32 Bit unsigned number to zero-terminated string
+**
 ** destroys d0-d2
 **
 ** -> a0 = String Buffer end address
