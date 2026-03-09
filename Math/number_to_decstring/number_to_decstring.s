@@ -1,12 +1,15 @@
 **
 ** Date: 07.03.2026
 **
-** Important: needs 68020 or higher!!!
+** Important: There are two subroutines:
 **
-** Description: converts the decimal number 269488144 to decimal string
+**            One ist for all 68000er CPU's and the other is
+**            optimized for 68020+ CPU's
+**
+** Description: converts a decimal number (here: 269488144) to decimal string
 **              and writes this decimal string to cli window
 **
-                        machine 68020			        ; treat this source as 68080 code.
+                        machine 68020			        ; treat this source as 68020 code.
 
                 
 ExecBase        equ 4
@@ -18,10 +21,9 @@ Output          equ -60
                         code_f
 
                         move.L  #269488144,d0
-                        move.L  #decstring_end,a0
-                        bsr     number_to_decstring
-                        move.L  d2,str_length
-                        movea.L a0,a5
+                        move.L  #decstring,a0
+                        bsr     number_to_decstring_68000
+                        move.L  d1,str_length
 
 *************** Open DOS-Lib **************************************************
 
@@ -42,7 +44,7 @@ Output          equ -60
 *************** Output Text ***************************************************
 
                         move.L  clihandle,d1            ; Load Handle in d1
-                        move.L  a5,d2           ; Address of text in memory
+                        move.l  #decstring,d2           ; Address of text in memory
                         move.L  str_length,d3           ; Text length in d3
                         jsr     Write(a6)               ; Call DOS Write
 
@@ -54,7 +56,72 @@ Output          equ -60
 
 exit:                   rts                        
 
-*************** number_to_decstring *******************************************
+*************** number_to_decstring 68000 *************************************
+**
+** Converts a 32 Bit unsigned number to zero-terminated string
+**
+** -> a0 = string buffer start address
+** -> d0 = number to convert
+** <- a0 = string start address
+** <- d1 = string length
+**
+
+number_to_decstring_68000:
+                        movem.l d2-d5/a0-a1,-(sp)   ; save registers
+                        lea     PowerTable(pc),a1   ; Address of the powers of 10
+
+                        clr.l   d1                  ; reset length counter to 0
+                        moveq   #0,d4               ; Flag for leading zeros (0 = suppress)
+
+NextPower:
+                        move.l  (a1)+,d2            ; get first/next power of 10 from table
+                        beq.s   Terminate           ; 0 marks end -> Terminate
+                        moveq   #'0',d3             ; ASCII Character '0'
+
+SubtractLoop:
+                        sub.l   d2,d0               ; subtract table value
+                        bcs.s   Restore             ; if carry set = negative -> finished this digit
+                        addq.b  #1,d3               ; increment ASCII-Character
+                        bra.s   SubtractLoop        ; loop
+
+Restore:
+                        add.l   d2,d0               ; undo last subtraction
+    
+                        * test for leading zeros
+                        cmp.b   #'0',d3             ; test if character = '0'?
+                        bne.s   StoreDigit          ; No -> save always
+                        tst.l   d4                  ; have we already saved a digit?
+                        bne.s   StoreDigit          ; Yes -> not first digit -> save
+                        cmp.l   #1,d2               ; Is this the very last position?
+                        beq.s   StoreDigit          ; Yes -> save "0" if digit = 0
+                        bra.s   NextPower           ; No? -> ignore and go on
+
+StoreDigit:
+                        move.b  d3,(a0)+            ; Write character to buffer
+                        addq.l  #1,d1               ; increment length by 1
+                        moveq   #1,d4               ; set flag for first digit
+                        bra.s   NextPower
+
+Terminate:
+                        clr.b   (a0)                ; set last byte = 0 (terminated string)
+                        movem.l (sp)+,d2-d5/a0-a1   ; restore registers
+                        rts
+
+    align 2
+PowerTable:
+    dc.l    1000000000
+    dc.l    100000000
+    dc.l    10000000
+    dc.l    1000000
+    dc.l    100000
+    dc.l    10000
+    dc.l    1000
+    dc.l    100
+    dc.l    10
+    dc.l    1
+    dc.l    0
+
+*************** number_to_decstring 68020 *************************************
 **
 ** Converts a 32 Bit unsigned number to zero-terminated string
 **
@@ -64,8 +131,10 @@ exit:                   rts
 ** -> d0 = number to convert
 ** <- a0 = Result string start address
 ** <- d2 = string length
+**
 
-number_to_decstring:    moveq.l #0,d2               ; counter for string length
+number_to_decstring_68020:
+                        moveq.l #0,d2               ; counter for string l1ength
                         clr.b   (a0)                ; string is null terminated
 
 loop1:                  divul.L #10,d1:d0           ; d1 = remainder / d0 = quotient
