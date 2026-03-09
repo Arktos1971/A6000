@@ -33,15 +33,20 @@ $(TARGET) : $(OBJECTS)
 number_to_decstring.o : number_to_decstring.s
 	vasm -Fhunk -o number_to_decstring.o number_to_decstring.s
 
-# The robust solution for CMD + PowerShell
 copy: $(TARGET)
-	@echo Searching for drive $(SDCARD) ...
-	@for /f "usebackq delims=" %%d in (`powershell -NoProfile -Command "Get-Volume -FileSystemLabel '$(SDCARD)' | Select-Object -ExpandProperty DriveLetter"`) do @( \
-		if not "%%d" == "" ( \
-			echo Found drive: %%d: && \
-			copy /y "$(TARGET)" "%%d:\" \
-		) \
-	)
+	@echo Searching for drive "$(SDCARD)" ...
+	@powershell -NoProfile -Command "\
+		$$drive = Get-Volume -FileSystemLabel '$(SDCARD)' -ErrorAction SilentlyContinue | Select-Object -ExpandProperty DriveLetter; \
+		if (-not $$drive) { \
+			Write-Host '-----------------------------------------' -ForegroundColor Red; \
+			Write-Host 'ERROR: Drive with label \"$(SDCARD)\" not found!'; \
+			Write-Host 'Please insert the SD card and try again.'; \
+			Write-Host '-----------------------------------------' -ForegroundColor Red; \
+			exit 1; \
+		} \
+		Write-Host \"Found drive: $${drive}:\" -ForegroundColor Green; \
+		Copy-Item -Path '$(TARGET)' -Destination \"$${drive}:\\\" -Force; \
+		Write-Host 'Copy successful!' -ForegroundColor Green"
 
 clean:
 	@if exist $(TARGET) del /q $(TARGET)
