@@ -1,3 +1,21 @@
+# This makefile does the following:
+# 
+# 1. Clean working directory
+# 2. Assemble and link the project
+# 3. Copy the TARGET file to an extern SDCARD
+#
+# I am working in a Windows environment therefore
+# the need of the SHELL variable
+#
+# The copying process is a bit of a convoluted affair
+# because I determine the destination drive not by a
+# drive letter – which can change on removable media –
+# but by the volume label. See variable SDCARD.
+# This is more difficult under Windows than you might
+# think, and the only working option seems to be PowerShell,
+# which is what I'm using here!
+#
+
 TARGET      = number_to_decstring.exe
 OBJECTS     = number_to_decstring.o
 LIBS        = amiga
