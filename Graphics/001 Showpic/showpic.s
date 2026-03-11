@@ -1,89 +1,69 @@
 **
-**	$VER: BlueScreenFast.s v1.0 release (9 February 2026)
-**	Platform: Apollo Vampire (SAGA Graphics)
-**	Assemble command:
-**	Programs:Developer/VASM/vasmm68k_mot BlueScreenFast.s -Fhunkexe
-**	
-**	Original Author: Tomas Jacobsen - Bedroomcoders.com
-**  Author: Kai Kruschinski
+** Date:    11.03.2026
+** Author:  Kai Kruschinski
 **
-**	Description: 
-**	This code was inspired by BlueScreenFast from Tomas Jacobsen.
-**	Instead of blue pixel the code now shows a picture (1280x720 - 16 Bit Color)
-**  and is waiting for left mouse button. Actually not really  exciting,
-**  but a starting point for my rusted 68k skills.
+** Description:
+** 
+** This code was inspired by BlueScreenFast from Tomas Jacobsen.
+** Instead of blue pixel the code now shows a picture (1280x720 - 16 Bit Color)
+** and is waiting for left mouse button. Actually not really  exciting,
+** but a starting point for my rusted 68k skills.
 **			
 **
 
+                    machine 68080					; Apollo 68080 Chip
 
-			opt d+
-			
-			machine 68080					; NOTE - Tells the assembler to treat this source as 68080 code.
+                    incdir	"L:\Amiga\Include"
+                    include	"exec\exec_lib.i"
 
-			incdir	"L:\Amiga\Include"
-			include	"exec\exec_lib.i"
+GFXCON		    equ	$dff1f4
+GFXCONR		    equ	$dfe1f4
+BPLHMOD		    equ	$dff1e6
+BPLHMODR	    equ	$dfe1e6
+BPLHPTH		    equ	$dff1ec
+BPLHPTHR	    equ	$dfe1ec
+SPRHSTRT	    equ	$dff1d0
 
-			output	showpic.exe
+                    code_f
 
+                    movea.l	4.w,a6                      ; Disable Interrupt Processing
+                    jsr	_LVODisable(a6)                 ; so mouse cannot move
 
-			
-DMACON		equ	$dff096
-DMACONR		equ	$dff002
-GFXCON		equ	$dff1f4
-GFXCONR		equ	$dfe1f4
-BPLHMOD		equ	$dff1e6
-BPLHMODR	equ	$dfe1e6
-BPLHPTH		equ	$dff1ec
-BPLHPTHR	equ	$dfe1ec
-SPRHSTRT	equ	$dff1d0
+                    move.w	GFXCONR,store_gfxcon
+                    move.w	BPLHMODR,store_bplhmod
+                    move.l	BPLHPTHR,store_bplhpth
 
+                    clr.l	SPRHSTRT				    ; Clear mousepointers sprite 0
+                    move.w	#$0a02,GFXCON			    ; 0a = 1280x720, 02 = 16 bit chunky 
+                    clr.w	BPLHMOD					    ; Clear AGA modulo
 
+                    lea	_FrameBuffer,a0                 ; Pointer to Framebuffer
+                    add.l	#32,a0                      ; align the Screenpointer to 32 bits
+                    and.l	#$ffffff80,a0               ; in the _Framebuffer -> faster data access!
+                    move.l	a0,_ScreenPointer
 
-			section mycode,code
+                    move.l	a0,BPLHPTH
 
-			
-_Init		movea.l	4.w,a6
-			jsr	_LVODisable(a6)
+lmbLoop          	btst	#6,$bfe001  				; Wait for left mousebutton
+                    bne.s	lmbLoop
 
-			move.w	DMACONR,store_dmacon	; save registers
-			move.w	GFXCONR,store_gfxcon
-			move.w	BPLHMODR,store_bplhmod
-			move.l	BPLHPTHR,store_bplhpth
+                    move.w	store_gfxcon,GFXCON
+                    move.w	store_bplhmod,BPLHMOD
+                    move.l	store_bplhpth,BPLHPTH
 
-			move.w	#$7fff,DMACON			; Disable all DMA (Interrups, audio, disk, etc)
-			clr.l	SPRHSTRT				; Clear mousepointers sprite
-			move.w	#$0a02,GFXCON			; 0a = 1280x720, 02 = 16 bit chunky 
-			clr.w	BPLHMOD					; Clear modulo
+                    movea.l	4.w,a6                      ; Enable Interrupt Processing
+                    jsr	_LVOEnable(a6)
 
-			lea	_FrameBuffer,a0
-			add.l	#32,a0
-			and.l	#$ffffff80,a0
-			move.l	a0,_ScreenPointer		; This trick aligns the Screenpointer to 32 bits in the Framebuffer = Quicker access to the data
+                    rts
 
-			move.l	a0,BPLHPTH
+                    bss_f
 
-.lmbLoop	btst	#6,$bfe001				; Wait for left mousebutton
-			bne.s	.lmbLoop
-
-
-			move.w	store_dmacon,DMACON		; restore saved registers
-			move.w	store_gfxcon,GFXCON
-			move.w	store_bplhmod,BPLHMOD
-			move.l	store_bplhpth,BPLHPTH
-
-			movea.l	4.w,a6
-			jsr	_LVOEnable(a6)
-			rts
-
-			section	mydata,bss
-
-store_dmacon		ds.w	1
 store_gfxcon		ds.w	1
 store_bplhmod		ds.w	1
 store_bplhpth		ds.l	1
-_ScreenPointer		ds.l	1				; Aligned and populated at runtime
+_ScreenPointer		ds.l	1				            ; Aligned and populated at runtime
 
 
-			section myscreen,data			; Place Screen/Framebuffer in it's own section always works best
+                    data_f
 			
-_FrameBuffer		incbin "test-rgb565.raw"			
+_FrameBuffer		incbin "test-rgb565.raw"			; Image data loads here
