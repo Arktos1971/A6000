@@ -2,6 +2,9 @@
 **	COPPER-GELLY
 **	CODED BY CRADON/MATRIX
 **	ASM-ONE FORMAT
+**
+**  Adapted for vasm
+**  12.03.2026
 
 *******************************************************************************
 
