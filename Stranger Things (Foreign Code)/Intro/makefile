@@ -17,8 +17,8 @@
 # which is what I'm using here!
 #
 
-TARGET      = intro.exe
-OBJECTS     = intro.o
+TARGET      = coppervect.exe
+OBJECTS     = coppervect.o
 #LIB         = amiga
 #LIBDIR      = L:\Amiga\Lib
 SDCARD      = A6000
@@ -32,8 +32,8 @@ all: clean $(TARGET) copy copylocal
 $(TARGET) : $(OBJECTS)
 	vlink -b amigahunk -o $(TARGET) $(OBJECTS)
 
-intro.o : intro.s
-	vasm -Fhunk -o intro.o intro.s
+coppervect.o : coppervect.s
+	vasm -Fhunk -o coppervect.o coppervect.s
 
 copy: $(TARGET)
 	@echo Searching for drive "$(SDCARD)" ...
