@@ -1,12 +1,12 @@
 **
-** Date: 07.03.2026 /14.04.2026
+** Date: 07.03.2026 / 17.04.2026
 **
 ** Important: There are two subroutines:
 **
 **            One ist for all 68000er CPU's and the other is
 **            optimized for 68020+ CPU's
 **
-** Description: converts a decimal number (here: 269488144) to string
+** Description: converts an unsigned integer (here: 269488144) to string
 **              and writes this string to cli window
 **
                         machine 68020			        ; treat this source as 68020 code.
